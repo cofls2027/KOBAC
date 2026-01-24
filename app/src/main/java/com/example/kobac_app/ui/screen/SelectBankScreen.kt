@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.components.CustomCheckbox
 import com.example.kobac_app.ui.theme.*
@@ -32,12 +33,12 @@ fun SelectBankScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     val allBanks = remember {
         listOf(
-            Bank("우리은행", android.R.drawable.ic_menu_compass),
-            Bank("신한은행", android.R.drawable.ic_menu_send),
-            Bank("국민은행", android.R.drawable.ic_menu_myplaces),
-            Bank("하나은행", android.R.drawable.ic_menu_search),
-            Bank("농협은행", android.R.drawable.ic_menu_save),
-            Bank("토스뱅크", android.R.drawable.ic_menu_share)
+            Bank("우리은행", R.drawable.wooribank),
+            Bank("신한은행", R.drawable.shinhanbank),
+            Bank("국민은행", R.drawable.kookminbank),
+            Bank("하나은행", R.drawable.hanabank),
+            Bank("농협은행", R.drawable.nhbank),
+            Bank("토스뱅크", R.drawable.tossbank)
         )
     }
     var selectedBanks by remember { mutableStateOf(setOf<Bank>()) }

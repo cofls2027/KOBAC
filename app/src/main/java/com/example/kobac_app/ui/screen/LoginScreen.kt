@@ -1,6 +1,7 @@
 package com.example.kobac_app.ui.screen
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.*
 
@@ -97,11 +100,23 @@ fun LoginScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(24.dp), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedButton(onClick = { /* TODO */ }, modifier = Modifier.size(56.dp), shape = CircleShape, contentPadding = PaddingValues(0.dp), border = BorderStroke(1.dp, Color.LightGray)) {
-                Text("F", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = DeepBlue)
+            OutlinedButton(
+                onClick = { /* TODO: Facebook Login */ },
+                modifier = Modifier.size(56.dp),
+                shape = CircleShape,
+                contentPadding = PaddingValues(0.dp),
+                border = BorderStroke(1.dp, Color.LightGray)
+            ) {
+                Image(painter = painterResource(id = R.drawable.facebook_logo), contentDescription = "Facebook Login", modifier = Modifier.size(40.dp))
             }
-            OutlinedButton(onClick = { /* TODO */ }, modifier = Modifier.size(56.dp), shape = CircleShape, contentPadding = PaddingValues(0.dp), border = BorderStroke(1.dp, Color.LightGray)) {
-                Text("G", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Gray)
+            OutlinedButton(
+                onClick = { /* TODO: Google Login */ },
+                modifier = Modifier.size(56.dp),
+                shape = CircleShape,
+                contentPadding = PaddingValues(0.dp),
+                border = BorderStroke(1.dp, Color.LightGray)
+            ) {
+                Image(painter = painterResource(id = R.drawable.google_logo), contentDescription = "Google Login", modifier = Modifier.size(40.dp))
             }
         }
 

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.components.CustomCheckbox
 import com.example.kobac_app.ui.theme.*
@@ -32,10 +33,10 @@ fun SelectVirtualAssetScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     val allAssets = remember {
         listOf(
-            VirtualAsset("Tezos", "tz1094...14fnks9e3", android.R.drawable.ic_dialog_info),
-            VirtualAsset("Crypto.com", "0xa1df...14fnks9e3", android.R.drawable.ic_dialog_dialer),
-            VirtualAsset("Ethereum", "0xa1df...14fnks9e3", android.R.drawable.ic_dialog_email),
-            VirtualAsset("Bitcoin", "0xa1df...14fnks9e3", android.R.drawable.ic_dialog_map)
+            VirtualAsset("Tezos", "tz1094...14fnks9e3", R.drawable.xtz),
+            VirtualAsset("Polkadot", "0xa1df...14fnks9e3", R.drawable.dot),
+            VirtualAsset("EthereumPoW", "0xa1df...14fnks9e3", R.drawable.ethw),
+            VirtualAsset("Bitcoin", "0xa1df...14fnks9e3", R.drawable.btc)
         )
     }
     var selectedAssets by remember { mutableStateOf(setOf<VirtualAsset>()) }

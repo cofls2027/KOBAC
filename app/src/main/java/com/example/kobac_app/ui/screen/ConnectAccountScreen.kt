@@ -1,5 +1,7 @@
 package com.example.kobac_app.ui.screen
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,7 +14,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,11 +25,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.*
+import kotlinx.coroutines.delay
 
 @Composable
 fun ConnectAccountScreen(navController: NavController) {
+    val logos = listOf(R.drawable.woori, R.drawable.shinhan)
+    var currentLogoIndex by remember { mutableStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1500) // Change image every 1.5 seconds
+            currentLogoIndex = (currentLogoIndex + 1) % logos.size
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,12 +62,16 @@ fun ConnectAccountScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // TODO: Replace with your actual logo
-        Image(
-            painter = painterResource(id = android.R.drawable.ic_secure),
-            contentDescription = "Security Logo Placeholder",
-            modifier = Modifier.size(80.dp)
-        )
+        Crossfade(
+            targetState = currentLogoIndex,
+            animationSpec = tween(durationMillis = 500) // Fade animation
+        ) {
+            Image(
+                painter = painterResource(id = logos[it]),
+                contentDescription = "Bank Logo",
+                modifier = Modifier.size(80.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 

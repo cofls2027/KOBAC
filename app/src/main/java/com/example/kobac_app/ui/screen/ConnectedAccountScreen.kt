@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.*
 
@@ -27,15 +28,15 @@ data class ConnectedVirtualAsset(val address: String, val amount: String, val va
 @Composable
 fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Boolean) {
     val bankAccounts = listOf(
-        Account("우리은행", "3,000,000원", android.R.drawable.ic_menu_compass),
-        Account("우리은행", "3,000,000원", android.R.drawable.ic_menu_compass),
-        Account("우리은행", "3,000,000원", android.R.drawable.ic_menu_compass),
-        Account("우리은행", "3,000,000원", android.R.drawable.ic_menu_compass)
+        Account("우리은행", "3,000,000원", R.drawable.wooribank),
+        Account("우리은행", "3,000,000원", R.drawable.wooribank),
+        Account("우리은행", "3,000,000원", R.drawable.wooribank),
+        Account("우리은행", "3,000,000원", R.drawable.wooribank)
     )
     val virtualAssets = listOf(
-        ConnectedVirtualAsset("tz1095...14fh14oin", "3,000,000 XTZ", "1,200,000원", android.R.drawable.ic_dialog_info),
-        ConnectedVirtualAsset("tz1095...14fh14oin", "3,000,000 XTZ", "1,200,000원", android.R.drawable.ic_dialog_info),
-        ConnectedVirtualAsset("tz1095...14fh14oin", "3,000,000 XTZ", "1,200,000원", android.R.drawable.ic_dialog_info)
+        ConnectedVirtualAsset("tz1095...14fh14oin", "3,000,000 XTZ", "1,200,000원", R.drawable.xtz),
+        ConnectedVirtualAsset("tz1095...14fh14oin", "3,000,000 XTZ", "1,200,000원", R.drawable.xtz),
+        ConnectedVirtualAsset("tz1095...14fh14oin", "3,000,000 XTZ", "1,200,000원", R.drawable.xtz)
     )
 
     LazyColumn(
