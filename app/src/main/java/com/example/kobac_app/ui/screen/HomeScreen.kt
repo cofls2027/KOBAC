@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.KOBAC_appTheme
 import com.example.kobac_app.ui.theme.ButtonBlue
@@ -50,7 +51,8 @@ fun HomeScreen(navController: NavController) {
         Text(
             text = "Knot과 함께 모든 금융을\n연결해보세요!",
             color = Black,
-            fontSize = 20.sp,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth(),
             lineHeight = 30.sp
@@ -59,16 +61,9 @@ fun HomeScreen(navController: NavController) {
         Spacer(modifier = Modifier.weight(1f))
 
         Image(
-            painter = painterResource(id = android.R.drawable.ic_menu_gallery), // Placeholder
-            contentDescription = "App Logo Placeholder",
+            painter = painterResource(id = R.drawable.knot),
+            contentDescription = "App Logo",
             modifier = Modifier.size(100.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Knot",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            color = Black
         )
 
         Spacer(modifier = Modifier.weight(1f))

@@ -9,7 +9,6 @@ import androidx.navigation.navArgument
 import com.example.kobac_app.ui.screen.*
 
 object AppRoutes {
-    const val SPLASH = "splash"
     const val LOGIN = "login"
     const val HOME = "home"
     const val CONNECT_ACCOUNT = "connect_account"
@@ -25,11 +24,8 @@ object AppRoutes {
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = AppRoutes.SPLASH) {
-        // ... other composables
-        composable(AppRoutes.SPLASH) {
-            SplashScreen(navController = navController)
-        }
+    // Start destination is now LOGIN
+    NavHost(navController = navController, startDestination = AppRoutes.LOGIN) {
         composable(AppRoutes.LOGIN) {
             LoginScreen(navController = navController)
         }
