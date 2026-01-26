@@ -63,7 +63,7 @@ fun HomeScreen(navController: NavController) {
         Image(
             painter = painterResource(id = R.drawable.knot),
             contentDescription = "App Logo",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(170.dp)
         )
 
         Spacer(modifier = Modifier.weight(1f))

@@ -56,7 +56,7 @@ fun ConnectAccountScreen(navController: NavController) {
         Image(
             painter = painterResource(id = R.drawable.knot),
             contentDescription = "Knot Logo",
-            modifier = Modifier.size(80.dp)
+            modifier = Modifier.size(170.dp)
         )
 
         Spacer(modifier = Modifier.weight(1f))
