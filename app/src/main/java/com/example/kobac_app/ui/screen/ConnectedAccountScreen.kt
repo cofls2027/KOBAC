@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,21 +21,23 @@ import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.*
 
-data class Account(val bankName: String, val balance: String, val logo: Int)
-data class ConnectedVirtualAsset(val address: String, val amount: String, val value: String, val logo: Int)
+// Data classes for financial and virtual assets
+data class FinancialAsset(val name: String, val balance: String, val logo: Int)
+data class VirtualAsset(val address: String, val balanceKrw: String, val balanceAsset: String, val logo: Int)
 
 @Composable
 fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Boolean) {
-    val bankAccounts = listOf(
-        Account("우리은행", "3,000,000원", R.drawable.wooribank),
-        Account("우리은행", "3,000,000원", R.drawable.wooribank),
-        Account("우리은행", "3,000,000원", R.drawable.wooribank),
-        Account("우리은행", "3,000,000원", R.drawable.wooribank)
+    // Sample data based on the new layout
+    val financialAssets = listOf(
+        FinancialAsset("우리은행", "3,000,000원", R.drawable.wooribank),
+        FinancialAsset("키움증권", "3,000,000원", R.drawable.knot), // Placeholder logo
+        FinancialAsset("토스뱅크", "3,000,000원", R.drawable.tossbank)
     )
     val virtualAssets = listOf(
-        ConnectedVirtualAsset("tz1095...14fh14oin", "3,000,000 XTZ", "1,200,000원", R.drawable.xtz),
-        ConnectedVirtualAsset("tz1095...14fh14oin", "3,000,000 XTZ", "1,200,000원", R.drawable.xtz),
-        ConnectedVirtualAsset("tz1095...14fh14oin", "3,000,000 XTZ", "1,200,000원", R.drawable.xtz)
+        VirtualAsset("0x123...1334", "3,000,000원", "0.13 BTC", R.drawable.knot), // Placeholder logo
+        VirtualAsset("0x123...1334", "3,000,000원", "0.13 ETH", R.drawable.knot), // Placeholder logo
+        VirtualAsset("0x123...1334", "3,000,000원", "0.13 SOL", R.drawable.knot), // Placeholder logo
+        VirtualAsset("0x123...1334", "3,000,000원", "0.13 XRP", R.drawable.knot)  // Placeholder logo
     )
 
     LazyColumn(
@@ -48,23 +49,23 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
         item { Spacer(modifier = Modifier.height(60.dp)) }
         item {
             Text("Knot, 새로운 금융을 한번에", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Black)
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
         item {
-            SummaryCard()
-            Spacer(modifier = Modifier.height(24.dp))
+            SummarySection()
+            Spacer(modifier = Modifier.height(32.dp))
         }
         item {
-            Text("은행 계좌", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
+            Text("금융 계좌", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
             Spacer(modifier = Modifier.height(8.dp))
-            BankAccountList(bankAccounts)
-            Spacer(modifier = Modifier.height(24.dp))
+            FinancialAssetList(financialAssets)
+            Spacer(modifier = Modifier.height(32.dp))
         }
         item {
             Text("가상 자산 계좌", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
             Spacer(modifier = Modifier.height(8.dp))
             if (showVirtualAssets) {
-                VirtualAssetAccountList(virtualAssets)
+                VirtualAssetList(virtualAssets)
             } else {
                 VirtualAssetEmptyCard(navController)
             }
@@ -74,36 +75,57 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
 }
 
 @Composable
-fun SummaryCard() {
-    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = LightGray)) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            SummaryRow("총 잔액", "3,000,000원", isTotal = true)
-            Divider(color = Color(0xFFE0E0E0), thickness = 1.dp, modifier = Modifier.padding(vertical = 12.dp))
-            SummaryRow("은행 잔액", "3,000,000원")
-            Spacer(modifier = Modifier.height(8.dp))
-            SummaryRow("가상자산 잔액", "3,000,000원")
-        }
+fun SummarySection() {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+        SummaryRow("총 자산", "3,000,000원", amountColor = ButtonBlue, isTotal = true)
+        Spacer(modifier = Modifier.height(16.dp))
+        SummaryRow("금융 계좌", "3,000,000원", titleColor = Gray, amountWeight = FontWeight.Normal)
+        Spacer(modifier = Modifier.height(8.dp))
+        SummaryRow("가상자산 계좌", "3,000,000원", titleColor = Gray, amountWeight = FontWeight.Normal)
     }
 }
 
 @Composable
-fun SummaryRow(title: String, amount: String, isTotal: Boolean = false) {
+fun SummaryRow(
+    title: String,
+    amount: String,
+    titleColor: Color = Black,
+    amountColor: Color = Black,
+    isTotal: Boolean = false,
+    amountWeight: FontWeight = FontWeight.Bold
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(title, fontSize = 16.sp, color = if (isTotal) Black else Gray, modifier = Modifier.weight(1f))
-        Text(amount, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
+        Text(title, fontSize = if (isTotal) 18.sp else 16.sp, color = titleColor, modifier = Modifier.weight(1f))
+        Text(amount, fontSize = if (isTotal) 20.sp else 18.sp, fontWeight = amountWeight, color = amountColor)
     }
 }
 
 @Composable
-fun BankAccountList(accounts: List<Account>) {
-    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = LightGray)) {
+fun FinancialAssetList(assets: List<FinancialAsset>) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = LightGray)
+    ) {
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
-            accounts.forEach { account ->
-                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Image(painter = painterResource(id = account.logo), contentDescription = "${account.bankName} Logo", modifier = Modifier.size(36.dp))
+            assets.forEachIndexed { index, asset ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = asset.logo),
+                        contentDescription = "${asset.name} Logo",
+                        modifier = Modifier.size(36.dp)
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(account.bankName, fontSize = 16.sp, color = Black, modifier = Modifier.weight(1f))
-                    Text(account.balance, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Black)
+                    Text(asset.name, fontSize = 16.sp, color = Black, modifier = Modifier.weight(1f))
+                    Text(asset.balance, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Black)
+                }
+                if (index < assets.lastIndex) {
+                    Divider(color = Color(0xFFE0E0E0), thickness = 1.dp)
                 }
             }
         }
@@ -111,18 +133,34 @@ fun BankAccountList(accounts: List<Account>) {
 }
 
 @Composable
-fun VirtualAssetAccountList(assets: List<ConnectedVirtualAsset>) {
-    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = LightGray)) {
+fun VirtualAssetList(assets: List<VirtualAsset>) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = LightGray)
+    ) {
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
-            assets.forEach { asset ->
-                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Image(painter = painterResource(id = asset.logo), contentDescription = null, modifier = Modifier.size(36.dp))
+            assets.forEachIndexed { index, asset ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = asset.logo),
+                        contentDescription = "Logo",
+                        modifier = Modifier.size(36.dp)
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(asset.address, fontSize = 16.sp, color = Black, modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.End) {
-                        Text(asset.amount, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Black)
-                        Text(asset.value, fontSize = 14.sp, color = Gray)
+                        Text(asset.balanceKrw, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Black)
+                        Text(asset.balanceAsset, fontSize = 14.sp, color = Gray)
                     }
+                }
+                if (index < assets.lastIndex) {
+                    Divider(color = Color(0xFFE0E0E0), thickness = 1.dp)
                 }
             }
         }
@@ -132,17 +170,27 @@ fun VirtualAssetAccountList(assets: List<ConnectedVirtualAsset>) {
 @Composable
 fun VirtualAssetEmptyCard(navController: NavController) {
     Column {
-        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = LightGray)) {
-            Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("아직 연결된 계좌 정보가 없습니다.", color = Gray, modifier = Modifier.fillMaxWidth())
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = LightGray)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth(),
+            ) {
+                Text("아직 연결된 계좌 정보가 없습니다.", color = Gray, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Knot을 통해 가상자산 정보까지 한번에 확인하세요!", color = Gray, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                Text("Knot을 통해 가상자산 정보까지 한번에 확인하세요!", color = Gray, fontSize = 14.sp)
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = { navController.navigate(AppRoutes.SELECT_VIRTUAL_ASSET) },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = ButtonBlue)
         ) {
@@ -151,18 +199,18 @@ fun VirtualAssetEmptyCard(navController: NavController) {
     }
 }
 
-@Preview(showBackground = true, name = "Initial State - No Virtual Assets")
-@Composable
-fun ConnectedAccountScreenPreview() {
-    KOBAC_appTheme {
-        ConnectedAccountScreen(navController = rememberNavController(), showVirtualAssets = false)
-    }
-}
-
 @Preview(showBackground = true, name = "Final State - With Virtual Assets")
 @Composable
 fun ConnectedAccountScreenWithAssetsPreview() {
     KOBAC_appTheme {
         ConnectedAccountScreen(navController = rememberNavController(), showVirtualAssets = true)
+    }
+}
+
+@Preview(showBackground = true, name = "Initial State - No Virtual Assets")
+@Composable
+fun ConnectedAccountScreenPreview() {
+    KOBAC_appTheme {
+        ConnectedAccountScreen(navController = rememberNavController(), showVirtualAssets = false)
     }
 }
