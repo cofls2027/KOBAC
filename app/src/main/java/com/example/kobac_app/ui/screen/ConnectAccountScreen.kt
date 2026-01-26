@@ -1,9 +1,9 @@
 package com.example.kobac_app.ui.screen
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,19 +28,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.*
-import kotlinx.coroutines.delay
 
 @Composable
 fun ConnectAccountScreen(navController: NavController) {
-    val logos = listOf(R.drawable.woori, R.drawable.shinhan)
-    var currentLogoIndex by remember { mutableStateOf(0) }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(1500) // Change image every 1.5 seconds
-            currentLogoIndex = (currentLogoIndex + 1) % logos.size
-        }
-    }
+    var isChecked by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -52,7 +43,7 @@ fun ConnectAccountScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(100.dp))
 
         Text(
-            text = "버튼 한번으로,\n카드 정보와 신용 정보를\n조회할 수 있습니다!",
+            text = "버튼 한번으로, \n카드 정보와 신용 정보를 \n조회할 수 있습니다!",
             color = Black,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -62,22 +53,24 @@ fun ConnectAccountScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Crossfade(
-            targetState = currentLogoIndex,
-            animationSpec = tween(durationMillis = 500) // Fade animation
-        ) {
-            Image(
-                painter = painterResource(id = logos[it]),
-                contentDescription = "Bank Logo",
-                modifier = Modifier.size(80.dp)
-            )
-        }
+        Image(
+            painter = painterResource(id = R.drawable.knot),
+            contentDescription = "Knot Logo",
+            modifier = Modifier.size(80.dp)
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
         // Agreement Section
         Surface(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { isChecked = !isChecked }
+                .border(
+                    width = 1.dp,
+                    color = if (isChecked) ButtonBlue else Color.Transparent,
+                    shape = RoundedCornerShape(12.dp)
+                ),
             shape = RoundedCornerShape(12.dp),
             color = LightGray,
             contentColor = Black
@@ -86,7 +79,11 @@ fun ConnectAccountScreen(navController: NavController) {
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.Check, contentDescription = "Checked", tint = Gray)
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = "Checked",
+                    tint = if (isChecked) ButtonBlue else Gray
+                )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text("선택 동의", fontWeight = FontWeight.Bold, fontSize = 16.sp)
