@@ -30,14 +30,14 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
     // Sample data based on the new layout
     val financialAssets = listOf(
         FinancialAsset("우리은행", "3,000,000원", R.drawable.wooribank),
-        FinancialAsset("키움증권", "3,000,000원", R.drawable.knot), // Placeholder logo
+        FinancialAsset("키움증권", "3,000,000원", R.drawable.kiwoom),
         FinancialAsset("토스뱅크", "3,000,000원", R.drawable.tossbank)
     )
     val virtualAssets = listOf(
-        VirtualAsset("0x123...1334", "3,000,000원", "0.13 BTC", R.drawable.knot), // Placeholder logo
-        VirtualAsset("0x123...1334", "3,000,000원", "0.13 ETH", R.drawable.knot), // Placeholder logo
-        VirtualAsset("0x123...1334", "3,000,000원", "0.13 SOL", R.drawable.knot), // Placeholder logo
-        VirtualAsset("0x123...1334", "3,000,000원", "0.13 XRP", R.drawable.knot)  // Placeholder logo
+        VirtualAsset("0x123...1334", "3,000,000원", "0.13 BTC", R.drawable.btc),
+        VirtualAsset("0x123...1334", "3,000,000원", "0.13 ETH", R.drawable.eth),
+        VirtualAsset("0x123...1334", "3,000,000원", "0.13 SOL", R.drawable.sol),
+        VirtualAsset("0x123...1334", "3,000,000원", "0.13 XRP", R.drawable.xrp)
     )
 
     LazyColumn(

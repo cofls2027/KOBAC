@@ -36,10 +36,7 @@ fun ConnectingVirtualAssetScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         delay(2000) // 2초 딜레이
-        navController.navigate(AppRoutes.connectedAccountRoute(showAssets = true)) {
-            // Prevent going back to the connecting/address entry screens
-            popUpTo(AppRoutes.HOME) 
-        }
+        navController.navigate(AppRoutes.CONNECTION_COMPLETE)
     }
 
     LaunchedEffect(Unit) {

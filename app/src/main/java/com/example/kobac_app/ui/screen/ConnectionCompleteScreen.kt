@@ -24,9 +24,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun ConnectionCompleteScreen(navController: NavController) {
     LaunchedEffect(Unit) {
-        delay(2000) // 2초 후 홈으로 이동
-        navController.navigate(AppRoutes.HOME) {
-            popUpTo(AppRoutes.LOGIN) { inclusive = true }
+        delay(2000) // 2초 후 최종 화면으로 이동
+        navController.navigate(AppRoutes.connectedAccountRoute(showAssets = true)) {
+            popUpTo(AppRoutes.HOME) { inclusive = false } // Keep Home on the back stack
         }
     }
 
