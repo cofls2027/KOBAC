@@ -36,7 +36,7 @@ fun ConnectingVirtualAssetScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         delay(2000) // 2초 딜레이
-        navController.navigate(AppRoutes.CONNECTION_COMPLETE)
+        navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = true))
     }
 
     LaunchedEffect(Unit) {

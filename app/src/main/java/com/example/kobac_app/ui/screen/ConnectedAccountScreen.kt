@@ -56,7 +56,7 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
             Spacer(modifier = Modifier.height(32.dp))
         }
         item {
-            Text("금융 계좌", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
+            Text("금융 자산", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
             Spacer(modifier = Modifier.height(8.dp))
             FinancialAssetList(financialAssets)
             Spacer(modifier = Modifier.height(32.dp))
@@ -79,7 +79,7 @@ fun SummarySection() {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
         SummaryRow("총 자산", "3,000,000원", amountColor = ButtonBlue, isTotal = true)
         Spacer(modifier = Modifier.height(16.dp))
-        SummaryRow("금융 계좌", "3,000,000원", titleColor = Gray, amountWeight = FontWeight.Normal)
+        SummaryRow("금융 자산", "3,000,000원", titleColor = Gray, amountWeight = FontWeight.Normal)
         Spacer(modifier = Modifier.height(8.dp))
         SummaryRow("가상자산 계좌", "3,000,000원", titleColor = Gray, amountWeight = FontWeight.Normal)
     }

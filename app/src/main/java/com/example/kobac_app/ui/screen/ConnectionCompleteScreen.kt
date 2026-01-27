@@ -22,10 +22,11 @@ import com.example.kobac_app.ui.theme.KOBAC_appTheme
 import kotlinx.coroutines.delay
 
 @Composable
-fun ConnectionCompleteScreen(navController: NavController) {
+fun ConnectionCompleteScreen(navController: NavController, isVirtualAsset: Boolean) {
     LaunchedEffect(Unit) {
         delay(2000) // 2초 후 최종 화면으로 이동
-        navController.navigate(AppRoutes.connectedAccountRoute(showAssets = true)) {
+        val route = AppRoutes.connectedAccountRoute(showAssets = isVirtualAsset)
+        navController.navigate(route) {
             popUpTo(AppRoutes.HOME) { inclusive = false } // Keep Home on the back stack
         }
     }
@@ -58,6 +59,6 @@ fun ConnectionCompleteScreen(navController: NavController) {
 @Composable
 fun ConnectionCompleteScreenPreview() {
     KOBAC_appTheme {
-        ConnectionCompleteScreen(navController = rememberNavController())
+        ConnectionCompleteScreen(navController = rememberNavController(), isVirtualAsset = false)
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,22 +37,21 @@ fun SelectBankScreen(navController: NavController) {
 
     val allAssets = remember {
         listOf(
-            // 은행
             Asset("우리은행", R.drawable.wooribank, "은행"),
             Asset("신한은행", R.drawable.shinhanbank, "은행"),
             Asset("토스뱅크", R.drawable.tossbank, "은행"),
-            // 카드
-            Asset("현대카드", R.drawable.knot, "카드"),
-            Asset("농협카드", R.drawable.knot, "카드"),
-            Asset("우리카드", R.drawable.knot, "카드"),
-            // 증권
-            Asset("키움증권", R.drawable.knot, "증권"),
-            Asset("한화투자증권", R.drawable.knot, "증권"),
-            Asset("SK증권", R.drawable.knot, "증권"),
-            // 보험
-            Asset("삼성화재", R.drawable.knot, "보험"),
-            Asset("DB손해보험", R.drawable.knot, "보험"),
-            Asset("현대해상", R.drawable.knot, "보험")
+
+            Asset("현대카드", R.drawable.hdcard, "카드"),
+            Asset("농협카드", R.drawable.nhcard, "카드"),
+            Asset("우리카드", R.drawable.wooricard, "카드"),
+
+            Asset("키움증권", R.drawable.kiwoom, "증권"),
+            Asset("한화투자증권", R.drawable.hanhwa, "증권"),
+            Asset("SK증권", R.drawable.sk, "증권"),
+
+            Asset("삼성화재", R.drawable.samsung, "보험"),
+            Asset("DB손해보험", R.drawable.db, "보험"),
+            Asset("현대해상", R.drawable.hd, "보험")
         )
     }
     var selectedAssets by remember { mutableStateOf(setOf<Asset>()) }
@@ -62,10 +62,18 @@ fun SelectBankScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 32.dp)
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
-            Text("어떤 자산을 연결할까요?", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Black)
+            Spacer(modifier = Modifier.height(100.dp))
+            Text(
+                "어떤 자산을 연결할까요?",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Black,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+                lineHeight = 36.sp
+            )
             Spacer(modifier = Modifier.height(24.dp))
 
             TextField(
@@ -129,7 +137,7 @@ fun SelectBankScreen(navController: NavController) {
                 onClick = { navController.navigate(AppRoutes.CONNECTING) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 20.dp)
+                    .padding(horizontal = 32.dp, vertical = 20.dp)
                     .height(56.dp)
                     .align(Alignment.BottomCenter),
                 shape = RoundedCornerShape(12.dp),

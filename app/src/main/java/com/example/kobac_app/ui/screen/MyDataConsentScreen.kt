@@ -34,7 +34,7 @@ import com.example.kobac_app.ui.theme.*
 
 @Composable
 fun MyDataConsentScreen(navController: NavController) {
-    var isChecked by remember { mutableStateOf(true) }
+    var isChecked by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -45,32 +45,32 @@ fun MyDataConsentScreen(navController: NavController) {
     ) {
         Spacer(modifier = Modifier.height(100.dp))
 
-        val annotatedTitle = buildAnnotatedString {
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+        Column(modifier = Modifier.height(180.dp)) {
+            val annotatedTitle = buildAnnotatedString {
                 append("자산을 연결하려면\n")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("~~님의 동의가 필요해요")
+                }
             }
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append("~~님의 동의가 필요해요")
-            }
+
+            Text(
+                text = annotatedTitle,
+                color = Black,
+                fontSize = 24.sp,
+                modifier = Modifier.fillMaxWidth(),
+                lineHeight = 36.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "자산을 연결하기 전 신중하게 고민하여 필요한 서비스만 연결해주세요.\n사용하지 않는 서비스는 언제든지 삭제할 수 있습니다.",
+                color = Gray,
+                fontSize = 14.sp,
+                modifier = Modifier.fillMaxWidth(),
+                lineHeight = 22.sp
+            )
         }
-
-        Text(
-            text = annotatedTitle,
-            color = Black,
-            fontSize = 24.sp,
-            modifier = Modifier.fillMaxWidth(),
-            lineHeight = 36.sp
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "자산을 연결하기 전 신중하게 고민하여 필요한 서비스만 연결해주세요.\n사용하지 않는 서비스는 언제든지 삭제할 수 있습니다.",
-            color = Gray,
-            fontSize = 11.sp,
-            modifier = Modifier.fillMaxWidth(),
-            lineHeight = 22.sp
-        )
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -82,38 +82,42 @@ fun MyDataConsentScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { isChecked = !isChecked }
-                .border(
-                    width = 1.dp,
-                    color = if (isChecked) ButtonBlue else Color.LightGray,
-                    shape = RoundedCornerShape(12.dp)
-                ),
-            shape = RoundedCornerShape(12.dp),
-            color = LightGray,
-            contentColor = Black
+        Column(
+            modifier = Modifier.height(80.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isChecked = !isChecked }
+                    .border(
+                        width = 1.dp,
+                        color = if (isChecked) ButtonBlue else Color.LightGray,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+                shape = RoundedCornerShape(12.dp),
+                color = LightGray,
+                contentColor = Black
             ) {
-                Icon(
-                    Icons.Default.Check,
-                    contentDescription = "Checked",
-                    tint = if (isChecked) ButtonBlue else Gray
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("필수 동의", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text("마이데이터 서비스 이용약관", color = Gray, fontSize = 14.sp)
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = "Checked",
+                        tint = if (isChecked) ButtonBlue else Gray
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("필수 동의", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("마이데이터 서비스 이용약관", color = Gray, fontSize = 14.sp)
+                    }
+                    Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Expand", tint = Gray)
                 }
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Expand", tint = Gray)
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = { navController.navigate(AppRoutes.SELECT_BANK) },

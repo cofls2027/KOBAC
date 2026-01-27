@@ -42,14 +42,16 @@ fun ConnectAccountScreen(navController: NavController) {
     ) {
         Spacer(modifier = Modifier.height(100.dp))
 
-        Text(
-            text = "버튼 한번으로, \n카드 정보와 신용 정보를 \n조회할 수 있습니다!",
-            color = Black,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth(),
-            lineHeight = 36.sp
-        )
+        Column(modifier = Modifier.height(180.dp)) {
+            Text(
+                text = "버튼 한번으로,\n카드 정보와 신용 정보를\n조회할 수 있습니다!",
+                color = Black,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth(),
+                lineHeight = 36.sp
+            )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -61,39 +63,42 @@ fun ConnectAccountScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Agreement Section
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { isChecked = !isChecked }
-                .border(
-                    width = 1.dp,
-                    color = if (isChecked) ButtonBlue else Color.Transparent,
-                    shape = RoundedCornerShape(12.dp)
-                ),
-            shape = RoundedCornerShape(12.dp),
-            color = LightGray,
-            contentColor = Black
+        Column(
+            modifier = Modifier.height(80.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isChecked = !isChecked }
+                    .border(
+                        width = 1.dp,
+                        color = if (isChecked) ButtonBlue else Color.Transparent,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+                shape = RoundedCornerShape(12.dp),
+                color = LightGray,
+                contentColor = Black
             ) {
-                Icon(
-                    Icons.Default.Check,
-                    contentDescription = "Checked",
-                    tint = if (isChecked) ButtonBlue else Gray
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("선택 동의", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text("내 신용점수 서비스 약관 및 동의", color = Gray, fontSize = 14.sp)
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = "Checked",
+                        tint = if (isChecked) ButtonBlue else Gray
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("선택 동의", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("내 신용점수 서비스 약관 및 동의", color = Gray, fontSize = 14.sp)
+                    }
+                    Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Expand", tint = Gray)
                 }
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Expand", tint = Gray)
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = { navController.navigate(AppRoutes.MY_DATA_CONSENT) },

@@ -36,27 +36,29 @@ fun HomeScreen(navController: NavController) {
     ) {
         Spacer(modifier = Modifier.height(100.dp))
 
-        Text(
-            text = "연결되어 있는\n계좌정보가 없어요",
-            color = Black,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.fillMaxWidth(),
-            lineHeight = 36.sp
-        )
+        Column(modifier = Modifier.height(180.dp)) {
+            Text(
+                text = "연결되어 있는\n계좌정보가 없어요",
+                color = Black,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth(),
+                lineHeight = 36.sp
+            )
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text = "Knot과 함께 모든 금융을\n연결해보세요!",
-            color = Black,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.fillMaxWidth(),
-            lineHeight = 30.sp
-        )
+            Text(
+                text = "Knot과 함께 모든 금융을\n연결해보세요!",
+                color = Black,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth(),
+                lineHeight = 36.sp
+            )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -68,6 +70,13 @@ fun HomeScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.weight(1f))
 
+        Column(
+            modifier = Modifier.height(80.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+        }
+
         Button(
             onClick = { navController.navigate(AppRoutes.CONNECT_ACCOUNT) }, // Navigate to the new screen
             modifier = Modifier
@@ -76,20 +85,7 @@ fun HomeScreen(navController: NavController) {
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = ButtonBlue)
         ) {
-            Text("은행계좌 연결하기", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { /* TODO: Implement connect crypto asset */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = ButtonBlue)
-        ) {
-            Text("가상자산 연결하기", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("계좌 연결하기", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(60.dp))

@@ -15,10 +15,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,7 +35,7 @@ data class WalletAddress(val address: String, val logo: Int)
 fun EnterWalletAddressScreen(navController: NavController) {
     var addressInput by remember { mutableStateOf("") }
     var walletAddresses by remember { mutableStateOf(listOf<WalletAddress>()) }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     val assetLogos = listOf(R.drawable.btc, R.drawable.eth, R.drawable.sol, R.drawable.xrp) // Placeholder logos
 
@@ -42,10 +43,18 @@ fun EnterWalletAddressScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 32.dp)
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
-            Text("가상자산 지갑 주소를 입력하세요!", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Black)
+            Spacer(modifier = Modifier.height(100.dp))
+            Text(
+                "가상자산 지갑 주소를 입력하세요!",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Black,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+                lineHeight = 36.sp
+            )
             Spacer(modifier = Modifier.height(24.dp))
 
             TextField(
@@ -65,8 +74,8 @@ fun EnterWalletAddressScreen(navController: NavController) {
                         val logo = assetLogos[walletAddresses.size % assetLogos.size]
                         walletAddresses = walletAddresses + WalletAddress(addressInput, logo)
                         addressInput = ""
-                        keyboardController?.hide()
                     }
+                    focusManager.clearFocus()
                 })
             )
 
@@ -89,7 +98,7 @@ fun EnterWalletAddressScreen(navController: NavController) {
                 onClick = { navController.navigate(AppRoutes.CONNECTING_VIRTUAL_ASSET) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 20.dp)
+                    .padding(horizontal = 32.dp, vertical = 20.dp)
                     .height(56.dp)
                     .align(Alignment.BottomCenter),
                 shape = RoundedCornerShape(12.dp),

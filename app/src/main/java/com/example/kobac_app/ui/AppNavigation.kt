@@ -15,13 +15,14 @@ object AppRoutes {
     const val MY_DATA_CONSENT = "my_data_consent"
     const val SELECT_BANK = "select_bank"
     const val CONNECTING = "connecting"
-    const val CONNECTION_COMPLETE = "connection_complete"
+    const val CONNECTION_COMPLETE = "connection_complete/{is_virtual_asset}"
     const val CONNECTED_ACCOUNT = "connected_account/{show_assets}" // Argument for showing assets
     const val SELECT_VIRTUAL_ASSET = "select_virtual_asset"
     const val ENTER_WALLET_ADDRESS = "enter_wallet_address"
     const val CONNECTING_VIRTUAL_ASSET = "connecting_virtual_asset"
 
     fun connectedAccountRoute(showAssets: Boolean) = "connected_account/$showAssets"
+    fun connectionCompleteRoute(isVirtualAsset: Boolean) = "connection_complete/$isVirtualAsset"
 }
 
 @Composable
@@ -48,8 +49,12 @@ fun AppNavigation() {
         composable(AppRoutes.CONNECTING) {
             ConnectingScreen(navController = navController)
         }
-        composable(AppRoutes.CONNECTION_COMPLETE) {
-            ConnectionCompleteScreen(navController = navController)
+        composable(
+            route = AppRoutes.CONNECTION_COMPLETE,
+            arguments = listOf(navArgument("is_virtual_asset") { type = NavType.BoolType })
+        ) { backStackEntry ->
+            val isVirtualAsset = backStackEntry.arguments?.getBoolean("is_virtual_asset") ?: false
+            ConnectionCompleteScreen(navController = navController, isVirtualAsset = isVirtualAsset)
         }
         composable(
             route = AppRoutes.CONNECTED_ACCOUNT,
