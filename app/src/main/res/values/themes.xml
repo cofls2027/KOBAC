@@ -9,7 +9,7 @@
         <item name="windowSplashScreenBackground">@android:color/white</item>
 
         <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an            animated drawable. One of these is required. -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/google_logo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/knot</item>
         <item name="windowSplashScreenAnimationDuration">1000</item>
 
         <!-- Set the theme of the Activity that follows your splash screen. -->

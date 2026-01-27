@@ -43,10 +43,6 @@ fun LoginScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Image(painter = painterResource(id = R.drawable.knot), contentDescription = "App Logo", modifier = Modifier.size(170.dp))
-
-        Spacer(modifier = Modifier.height(40.dp))
-
         Text("아이디", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start, color = Black, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
         TextField(

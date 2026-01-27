@@ -28,7 +28,10 @@ fun ConnectingScreen(navController: NavController) {
         listOf(
             R.drawable.wooribank,
             R.drawable.shinhanbank,
-            R.drawable.tossbank
+            R.drawable.tossbank,
+            R.drawable.hdcard,
+            R.drawable.nhcard,
+            R.drawable.wooricard
         )
     }
     var currentImageIndex by remember { mutableStateOf(0) }
