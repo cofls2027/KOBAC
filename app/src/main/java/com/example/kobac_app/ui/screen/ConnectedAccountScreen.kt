@@ -137,14 +137,13 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
         }
     }
 
-    val totalNetWorth = portfolioData?.totalNetWorthKrw ?: 0.0
     val financialAssetTotal = portfolioData?.let { data ->
         data.bankList.sumOf { it.balanceAmt.toDoubleOrNull() ?: 0.0 } +
         data.bankIrpList.sumOf { it.balanceAmt.toDoubleOrNull() ?: 0.0 } +
         data.investList.sumOf { it.totalEvalAmt.toDoubleOrNull() ?: 0.0 } +
         data.investIrpList.sumOf { it.totalEvalAmt.toDoubleOrNull() ?: 0.0 }
     } ?: 0.0
-    val virtualAssetTotal = remember(showVirtualAssets) {
+    val virtualAssetTotal = remember(portfolioData, showVirtualAssets) {
         if (showVirtualAssets) {
             // 가상자산 연결 완료 시 하드코딩된 데이터의 총합 사용
             hardcodedCryptoAssets.sumOf { it.valueKrw.toDoubleOrNull() ?: 0.0 }
@@ -153,6 +152,7 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
             portfolioData?.cryptoList?.sumOf { it.valueKrw.toDoubleOrNull() ?: 0.0 } ?: 0.0
         }
     }
+    val totalNetWorth = financialAssetTotal + virtualAssetTotal
 
     if (isLoading) {
         Box(
@@ -340,7 +340,7 @@ fun VirtualAssetList(assets: List<VirtualAsset>) {
                     Text(asset.address, fontSize = 16.sp, color = Black, modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.End) {
                         Text(asset.balanceKrw, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Black)
-                        Text(asset.balanceAsset, fontSize = 14.sp, color = Gray)
+                        Text(asset.balanceAsset, fontSize = 12.sp, color = Gray)
                     }
                 }
                 if (index < assets.lastIndex) {
@@ -353,48 +353,37 @@ fun VirtualAssetList(assets: List<VirtualAsset>) {
 
 @Composable
 fun VirtualAssetEmptyCard(navController: NavController) {
-    Column {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = LightGray)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .fillMaxWidth(),
-            ) {
-                Text("아직 연결된 계좌 정보가 없습니다.", color = Gray, fontSize = 14.sp)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Knot을 통해 가상자산 정보까지 한번에 확인하세요!", color = Gray, fontSize = 14.sp)
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = { navController.navigate(AppRoutes.SELECT_VIRTUAL_ASSET) },
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = LightGray)
+    ) {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = ButtonBlue)
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("가상자산 연결하기", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Column(modifier = Modifier.weight(1f)) {
+                Text("연결된 가상자산 계좌가 없어요", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Black)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Knot과 함께 가상자산을 연결해 보세요!", fontSize = 12.sp, color = Gray)
+            }
+            Button(
+                onClick = { navController.navigate(AppRoutes.SELECT_VIRTUAL_ASSET) },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = ButtonBlue)
+            ) {
+                Text("연결하기", color = Color.White, fontSize = 14.sp)
+            }
         }
     }
 }
 
-@Preview(showBackground = true, name = "Final State - With Virtual Assets")
-@Composable
-fun ConnectedAccountScreenWithAssetsPreview() {
-    KOBAC_appTheme {
-        ConnectedAccountScreen(navController = rememberNavController(), showVirtualAssets = true)
-    }
-}
-
-@Preview(showBackground = true, name = "Initial State - No Virtual Assets")
+@Preview(showBackground = true)
 @Composable
 fun ConnectedAccountScreenPreview() {
     KOBAC_appTheme {
-        ConnectedAccountScreen(navController = rememberNavController(), showVirtualAssets = false)
+        ConnectedAccountScreen(navController = rememberNavController(), showVirtualAssets = true)
     }
 }
