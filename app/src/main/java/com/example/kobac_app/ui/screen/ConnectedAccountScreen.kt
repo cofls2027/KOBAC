@@ -42,11 +42,7 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
     LaunchedEffect(Unit) {
         try {
             val response = apiService.getPortfolio()
-            if (response.success && response.data != null) {
-                portfolioData = response.data
-            } else {
-                errorMessage = response.error?.message ?: "포트폴리오 조회에 실패했습니다"
-            }
+            portfolioData = response
         } catch (e: Exception) {
             errorMessage = "네트워크 오류가 발생했습니다: ${e.message}"
         } finally {
@@ -101,13 +97,13 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
         } ?: emptyList()
     }
 
-    val totalNetWorth = portfolioData?.totalNetWorthKrw ?: 0L
+    val totalNetWorth = portfolioData?.totalNetWorthKrw ?: 0.0
     val financialAssetTotal = portfolioData?.let { data ->
-        data.bankList.sumOf { it.balanceAmt.toLongOrNull() ?: 0L } +
-        data.bankIrpList.sumOf { it.balanceAmt.toLongOrNull() ?: 0L } +
-        data.investList.sumOf { it.totalEvalAmt.toLongOrNull() ?: 0L } +
-        data.investIrpList.sumOf { it.totalEvalAmt.toLongOrNull() ?: 0L }
-    } ?: 0L
+        data.bankList.sumOf { it.balanceAmt.toDoubleOrNull() ?: 0.0 } +
+        data.bankIrpList.sumOf { it.balanceAmt.toDoubleOrNull() ?: 0.0 } +
+        data.investList.sumOf { it.totalEvalAmt.toDoubleOrNull() ?: 0.0 } +
+        data.investIrpList.sumOf { it.totalEvalAmt.toDoubleOrNull() ?: 0.0 }
+    } ?: 0.0
 
     if (isLoading) {
         Box(
@@ -169,9 +165,14 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
 }
 
 fun formatAmount(amount: String): String {
-    val amountLong = amount.toLongOrNull() ?: 0L
+    val amountDouble = amount.toDoubleOrNull() ?: 0.0
     val formatter = NumberFormat.getNumberInstance(Locale.KOREA)
-    return "${formatter.format(amountLong)}원"
+    return "${formatter.format(amountDouble.toLong())}원"
+}
+
+fun formatAmount(amount: Double): String {
+    val formatter = NumberFormat.getNumberInstance(Locale.KOREA)
+    return "${formatter.format(amount.toLong())}원"
 }
 
 fun getBankLogo(bankName: String): Int {
@@ -195,13 +196,13 @@ fun getInvestLogo(companyName: String): Int {
 
 @Composable
 fun SummarySection(
-    totalNetWorth: Long,
-    financialAssetTotal: Long
+    totalNetWorth: Double,
+    financialAssetTotal: Double
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-        SummaryRow("총 자산", formatAmount(totalNetWorth.toString()), amountColor = ButtonBlue, isTotal = true)
+        SummaryRow("총 자산", formatAmount(totalNetWorth), amountColor = ButtonBlue, isTotal = true)
         Spacer(modifier = Modifier.height(16.dp))
-        SummaryRow("금융 자산", formatAmount(financialAssetTotal.toString()), titleColor = Gray, amountWeight = FontWeight.Normal)
+        SummaryRow("금융 자산", formatAmount(financialAssetTotal), titleColor = Gray, amountWeight = FontWeight.Normal)
         Spacer(modifier = Modifier.height(8.dp))
         SummaryRow("가상자산 계좌", "0원", titleColor = Gray, amountWeight = FontWeight.Normal)
     }

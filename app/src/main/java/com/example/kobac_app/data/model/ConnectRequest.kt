@@ -10,5 +10,5 @@ data class ConnectRequest(
     val userSearchId: String,
     
     @SerializedName("crypto_addresses")
-    val cryptoAddresses: Map<String, Any> = emptyMap()
+    val cryptoAddresses: Map<String, String> = emptyMap()
 )

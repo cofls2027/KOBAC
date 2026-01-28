@@ -10,6 +10,10 @@ object TokenManager {
     private const val KEY_USER_ID = "user_id"
     private const val KEY_USER_EMAIL = "user_email"
     private const val KEY_USER_NAME = "user_name"
+    private const val KEY_CRYPTO_BTC = "crypto_btc"
+    private const val KEY_CRYPTO_ETH = "crypto_eth"
+    private const val KEY_CRYPTO_SOL = "crypto_sol"
+    private const val KEY_CRYPTO_XRP = "crypto_xrp"
     
     private var prefs: SharedPreferences? = null
     
@@ -54,6 +58,25 @@ object TokenManager {
     
     fun getUserName(): String? {
         return prefs?.getString(KEY_USER_NAME, null)
+    }
+    
+    fun saveCryptoAddresses(addresses: Map<String, String>) {
+        prefs?.edit()?.apply {
+            addresses["btc"]?.let { putString(KEY_CRYPTO_BTC, it) }
+            addresses["eth"]?.let { putString(KEY_CRYPTO_ETH, it) }
+            addresses["sol"]?.let { putString(KEY_CRYPTO_SOL, it) }
+            addresses["xrp"]?.let { putString(KEY_CRYPTO_XRP, it) }
+            apply()
+        }
+    }
+    
+    fun getCryptoAddresses(): Map<String, String> {
+        val addresses = mutableMapOf<String, String>()
+        prefs?.getString(KEY_CRYPTO_BTC, null)?.let { addresses["btc"] = it }
+        prefs?.getString(KEY_CRYPTO_ETH, null)?.let { addresses["eth"] = it }
+        prefs?.getString(KEY_CRYPTO_SOL, null)?.let { addresses["sol"] = it }
+        prefs?.getString(KEY_CRYPTO_XRP, null)?.let { addresses["xrp"] = it }
+        return addresses
     }
     
     fun clear() {

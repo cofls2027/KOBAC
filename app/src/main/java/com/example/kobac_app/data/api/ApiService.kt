@@ -19,5 +19,5 @@ interface ApiService {
     suspend fun connectMyData(@Body request: ConnectRequest): ApiResponse<ConnectResponse>
     
     @GET("mydata/portfolio")
-    suspend fun getPortfolio(): ApiResponse<PortfolioResponse>
+    suspend fun getPortfolio(): PortfolioResponse
 }

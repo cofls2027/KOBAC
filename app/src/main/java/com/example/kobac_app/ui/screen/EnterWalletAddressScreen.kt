@@ -2,6 +2,7 @@ package com.example.kobac_app.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,16 +29,23 @@ import androidx.navigation.compose.rememberNavController
 import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.*
+import com.example.kobac_app.data.util.TokenManager
 
-data class WalletAddress(val address: String, val logo: Int)
+data class WalletAddress(val address: String, val logo: Int, val assetType: String)
 
 @Composable
 fun EnterWalletAddressScreen(navController: NavController) {
     var addressInput by remember { mutableStateOf("") }
-    var walletAddresses by remember { mutableStateOf(listOf<WalletAddress>()) }
+    var selectedAssetType by remember { mutableStateOf("btc") }
+    var walletAddresses by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     val focusManager = LocalFocusManager.current
 
-    val assetLogos = listOf(R.drawable.btc, R.drawable.eth, R.drawable.sol, R.drawable.xrp) // Placeholder logos
+    val assetTypes = listOf(
+        "btc" to R.drawable.btc,
+        "eth" to R.drawable.eth,
+        "sol" to R.drawable.sol,
+        "xrp" to R.drawable.xrp
+    )
 
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
         Column(
@@ -57,10 +65,39 @@ fun EnterWalletAddressScreen(navController: NavController) {
             )
             Spacer(modifier = Modifier.height(24.dp))
 
+            // 자산 타입 선택
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                assetTypes.forEach { (type, logo) ->
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { selectedAssetType = type },
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (selectedAssetType == type) ButtonBlue else LightGray
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Image(
+                                painter = painterResource(id = logo),
+                                contentDescription = type,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             TextField(
                 value = addressInput,
                 onValueChange = { addressInput = it },
-                placeholder = { Text("검색하기", color = Gray) },
+                placeholder = { Text("지갑 주소를 입력하세요", color = Gray) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon", tint = Gray) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -71,8 +108,7 @@ fun EnterWalletAddressScreen(navController: NavController) {
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = {
                     if (addressInput.isNotBlank()) {
-                        val logo = assetLogos[walletAddresses.size % assetLogos.size]
-                        walletAddresses = walletAddresses + WalletAddress(addressInput, logo)
+                        walletAddresses = walletAddresses + (selectedAssetType to addressInput)
                         addressInput = ""
                     }
                     focusManager.clearFocus()
@@ -87,15 +123,20 @@ fun EnterWalletAddressScreen(navController: NavController) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 80.dp) // Padding for the button
             ) {
-                items(walletAddresses) { wallet ->
-                    WalletAddressListItem(wallet)
+                items(walletAddresses.toList()) { (type, address) ->
+                    val logo = assetTypes.find { it.first == type }?.second ?: R.drawable.btc
+                    WalletAddressListItem(WalletAddress(address, logo, type))
                 }
             }
         }
 
         if (walletAddresses.isNotEmpty()) {
             Button(
-                onClick = { navController.navigate(AppRoutes.CONNECTING_VIRTUAL_ASSET) },
+                onClick = {
+                    // 주소 데이터를 TokenManager에 저장
+                    TokenManager.saveCryptoAddresses(walletAddresses)
+                    navController.navigate(AppRoutes.CONNECTING_VIRTUAL_ASSET)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp, vertical = 20.dp)

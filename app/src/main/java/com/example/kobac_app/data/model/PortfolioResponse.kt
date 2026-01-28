@@ -136,8 +136,8 @@ data class PortfolioResponse(
     val cryptoList: List<Any>,
     
     @SerializedName("totalNetWorthKrw")
-    val totalNetWorthKrw: Long,
+    val totalNetWorthKrw: Double,
     
     @SerializedName("totalNetWorthUsd")
-    val totalNetWorthUsd: Long
+    val totalNetWorthUsd: Double
 )
