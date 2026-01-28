@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.kobac_app.data.util.TokenManager
 import com.example.kobac_app.ui.AppNavigation
 import com.example.kobac_app.ui.theme.KOBAC_appTheme
 
@@ -17,6 +18,10 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
 
         super.onCreate(savedInstanceState)
+        
+        // TokenManager 초기화
+        TokenManager.initialize(this)
+        
         setContent {
             KOBAC_appTheme {
                 Surface(

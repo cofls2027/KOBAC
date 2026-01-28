@@ -7,8 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    // TODO: 실제 API Base URL로 변경 필요
-    private const val BASE_URL = "https://api.example.com/"
+    private const val BASE_URL = "https://knot.club-ott.org/api/v1/"
     
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

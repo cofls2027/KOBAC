@@ -26,14 +26,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.rememberCoroutineScope
 import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.*
+import com.example.kobac_app.data.api.RetrofitClient
+import com.example.kobac_app.data.api.ApiService
+import com.example.kobac_app.data.model.LoginRequest
+import com.example.kobac_app.data.util.TokenManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController) {
     var id by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    val apiService = remember { RetrofitClient.createService<ApiService>() }
 
     Column(
         modifier = Modifier
@@ -81,16 +91,67 @@ fun LoginScreen(navController: NavController) {
 
         Button(
             onClick = {
-                // Navigate to Home & clear back stack
-                navController.navigate(AppRoutes.HOME) {
-                    popUpTo(AppRoutes.LOGIN) { inclusive = true }
+                if (id.isBlank() || password.isBlank()) {
+                    errorMessage = "이메일과 비밀번호를 입력해주세요"
+                    return@Button
+                }
+                
+                isLoading = true
+                errorMessage = null
+                
+                scope.launch {
+                    try {
+                        val response = apiService.login(LoginRequest(id, password))
+                        
+                        if (response.success && response.data != null) {
+                            val loginResponse = response.data
+                            TokenManager.saveToken(loginResponse.accessToken, loginResponse.expiresInSec)
+                            TokenManager.saveUser(
+                                loginResponse.user.userId,
+                                loginResponse.user.email,
+                                loginResponse.user.name
+                            )
+                            
+                            // 로그인 성공 시 홈 화면으로 이동
+                            navController.navigate(AppRoutes.HOME) {
+                                popUpTo(AppRoutes.LOGIN) { inclusive = true }
+                            }
+                        } else {
+                            errorMessage = response.error?.message ?: "로그인에 실패했습니다"
+                        }
+                    } catch (e: Exception) {
+                        errorMessage = "네트워크 오류가 발생했습니다: ${e.message}"
+                    } finally {
+                        isLoading = false
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = ButtonBlue)
+            colors = ButtonDefaults.buttonColors(containerColor = ButtonBlue),
+            enabled = !isLoading
         ) {
-            Text("로그인", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("로그인", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+        
+        // 에러 메시지 표시
+        errorMessage?.let { error ->
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = error,
+                color = Color.Red,
+                fontSize = 14.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
