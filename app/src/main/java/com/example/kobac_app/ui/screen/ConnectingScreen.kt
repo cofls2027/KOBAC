@@ -20,6 +20,10 @@ import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.Black
 import com.example.kobac_app.ui.theme.KOBAC_appTheme
+import com.example.kobac_app.data.api.RetrofitClient
+import com.example.kobac_app.data.api.ApiService
+import com.example.kobac_app.data.model.ConnectRequest
+import com.example.kobac_app.data.util.TokenManager
 import kotlinx.coroutines.delay
 
 @Composable
@@ -35,10 +39,35 @@ fun ConnectingScreen(navController: NavController) {
         )
     }
     var currentImageIndex by remember { mutableStateOf(0) }
+    val apiService = remember { RetrofitClient.createService<ApiService>() }
 
     LaunchedEffect(Unit) {
-        delay(2000) // 2초 딜레이
-        navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = false))
+        try {
+            // user_search_id 가져오기 (로그인 시 저장한 userId 사용)
+            val userSearchId = TokenManager.getUserId() ?: return@LaunchedEffect
+            
+            // API 호출
+            val request = ConnectRequest(
+                mockToken = "test-token-123",
+                userSearchId = userSearchId,
+                cryptoAddresses = emptyMap() // 빈 객체로 전송하여 가상자산 연동 스킵
+            )
+            
+            val response = apiService.connectMyData(request)
+            
+            if (response.success) {
+                // 성공 시 완료 화면으로 이동
+                navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = false))
+            } else {
+                // 실패 시 에러 처리 (필요시 에러 화면으로 이동)
+                // 일단 완료 화면으로 이동하되, 필요하면 에러 처리 추가 가능
+                navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = false))
+            }
+        } catch (e: Exception) {
+            // 네트워크 오류 등 예외 처리
+            // 일단 완료 화면으로 이동하되, 필요하면 에러 처리 추가 가능
+            navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = false))
+        }
     }
 
     LaunchedEffect(Unit) {

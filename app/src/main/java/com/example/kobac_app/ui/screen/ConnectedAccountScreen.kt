@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +20,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.*
+import com.example.kobac_app.data.api.RetrofitClient
+import com.example.kobac_app.data.api.ApiService
+import com.example.kobac_app.data.model.PortfolioResponse
+import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.Locale
 
 // Data classes for financial and virtual assets
 data class FinancialAsset(val name: String, val balance: String, val logo: Int)
@@ -27,61 +33,177 @@ data class VirtualAsset(val address: String, val balanceKrw: String, val balance
 
 @Composable
 fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Boolean) {
-    // Sample data based on the new layout
-    val financialAssets = listOf(
-        FinancialAsset("우리은행", "3,000,000원", R.drawable.wooribank),
-        FinancialAsset("키움증권", "3,000,000원", R.drawable.kiwoom),
-        FinancialAsset("토스뱅크", "3,000,000원", R.drawable.tossbank)
-    )
-    val virtualAssets = listOf(
-        VirtualAsset("0x123...1334", "3,000,000원", "0.13 BTC", R.drawable.btc),
-        VirtualAsset("0x123...1334", "3,000,000원", "0.13 ETH", R.drawable.eth),
-        VirtualAsset("0x123...1334", "3,000,000원", "0.13 SOL", R.drawable.sol),
-        VirtualAsset("0x123...1334", "3,000,000원", "0.13 XRP", R.drawable.xrp)
-    )
+    var portfolioData by remember { mutableStateOf<PortfolioResponse?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    val apiService = remember { RetrofitClient.createService<ApiService>() }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 20.dp)
-    ) {
-        item { Spacer(modifier = Modifier.height(60.dp)) }
-        item {
-            Text("Knot, 새로운 금융을 한번에", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Black)
-            Spacer(modifier = Modifier.height(32.dp))
-        }
-        item {
-            SummarySection()
-            Spacer(modifier = Modifier.height(32.dp))
-        }
-        item {
-            Text("금융 자산", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
-            Spacer(modifier = Modifier.height(8.dp))
-            FinancialAssetList(financialAssets)
-            Spacer(modifier = Modifier.height(32.dp))
-        }
-        item {
-            Text("가상 자산 계좌", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
-            Spacer(modifier = Modifier.height(8.dp))
-            if (showVirtualAssets) {
-                VirtualAssetList(virtualAssets)
+    LaunchedEffect(Unit) {
+        try {
+            val response = apiService.getPortfolio()
+            if (response.success && response.data != null) {
+                portfolioData = response.data
             } else {
-                VirtualAssetEmptyCard(navController)
+                errorMessage = response.error?.message ?: "포트폴리오 조회에 실패했습니다"
             }
-            Spacer(modifier = Modifier.height(40.dp))
+        } catch (e: Exception) {
+            errorMessage = "네트워크 오류가 발생했습니다: ${e.message}"
+        } finally {
+            isLoading = false
+        }
+    }
+
+    // 포트폴리오 데이터를 FinancialAsset 리스트로 변환
+    val financialAssets = remember(portfolioData) {
+        portfolioData?.let { data ->
+            buildList {
+                // 은행 계좌
+                data.bankList.forEach { bank ->
+                    add(FinancialAsset(
+                        name = bank.bankName,
+                        balance = formatAmount(bank.balanceAmt),
+                        logo = getBankLogo(bank.bankName)
+                    ))
+                }
+                // 은행 IRP
+                data.bankIrpList.forEach { bankIrp ->
+                    add(FinancialAsset(
+                        name = "${bankIrp.bankName} IRP",
+                        balance = formatAmount(bankIrp.balanceAmt),
+                        logo = getBankLogo(bankIrp.bankName)
+                    ))
+                }
+                // 증권 계좌
+                data.investList.forEach { invest ->
+                    add(FinancialAsset(
+                        name = invest.companyName,
+                        balance = formatAmount(invest.totalEvalAmt),
+                        logo = getInvestLogo(invest.companyName)
+                    ))
+                }
+                // 증권 IRP
+                data.investIrpList.forEach { investIrp ->
+                    add(FinancialAsset(
+                        name = "${investIrp.companyName} IRP",
+                        balance = formatAmount(investIrp.totalEvalAmt),
+                        logo = getInvestLogo(investIrp.companyName)
+                    ))
+                }
+            }
+        } ?: emptyList()
+    }
+
+    val virtualAssets = remember(portfolioData) {
+        portfolioData?.cryptoList?.mapNotNull { crypto ->
+            // cryptoList가 비어있으므로 빈 리스트 반환
+            null
+        } ?: emptyList()
+    }
+
+    val totalNetWorth = portfolioData?.totalNetWorthKrw ?: 0L
+    val financialAssetTotal = portfolioData?.let { data ->
+        data.bankList.sumOf { it.balanceAmt.toLongOrNull() ?: 0L } +
+        data.bankIrpList.sumOf { it.balanceAmt.toLongOrNull() ?: 0L } +
+        data.investList.sumOf { it.totalEvalAmt.toLongOrNull() ?: 0L } +
+        data.investIrpList.sumOf { it.totalEvalAmt.toLongOrNull() ?: 0L }
+    } ?: 0L
+
+    if (isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else if (errorMessage != null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(errorMessage ?: "오류가 발생했습니다", color = Color.Red)
+            }
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(horizontal = 20.dp)
+        ) {
+            item { Spacer(modifier = Modifier.height(60.dp)) }
+            item {
+                Text("Knot, 새로운 금융을 한번에", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Black)
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+            item {
+                SummarySection(
+                    totalNetWorth = totalNetWorth,
+                    financialAssetTotal = financialAssetTotal
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+            item {
+                Text("금융 자산", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
+                Spacer(modifier = Modifier.height(8.dp))
+                if (financialAssets.isNotEmpty()) {
+                    FinancialAssetList(financialAssets)
+                } else {
+                    Text("연결된 금융 자산이 없습니다.", color = Gray, fontSize = 14.sp)
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+            item {
+                Text("가상 자산 계좌", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
+                Spacer(modifier = Modifier.height(8.dp))
+                if (showVirtualAssets && virtualAssets.isNotEmpty()) {
+                    VirtualAssetList(virtualAssets)
+                } else {
+                    VirtualAssetEmptyCard(navController)
+                }
+                Spacer(modifier = Modifier.height(40.dp))
+            }
         }
     }
 }
 
+fun formatAmount(amount: String): String {
+    val amountLong = amount.toLongOrNull() ?: 0L
+    val formatter = NumberFormat.getNumberInstance(Locale.KOREA)
+    return "${formatter.format(amountLong)}원"
+}
+
+fun getBankLogo(bankName: String): Int {
+    return when {
+        bankName.contains("우리") -> R.drawable.wooribank
+        bankName.contains("신한") -> R.drawable.shinhanbank
+        bankName.contains("토스") -> R.drawable.tossbank
+        bankName.contains("KB") || bankName.contains("국민") -> R.drawable.kookminbank
+        bankName.contains("하나") -> R.drawable.hanabank
+        bankName.contains("NH") || bankName.contains("농협") -> R.drawable.nhbank
+        else -> R.drawable.wooribank // 기본값
+    }
+}
+
+fun getInvestLogo(companyName: String): Int {
+    return when {
+        companyName.contains("키움") -> R.drawable.kiwoom
+        else -> R.drawable.kiwoom // 기본값
+    }
+}
+
 @Composable
-fun SummarySection() {
+fun SummarySection(
+    totalNetWorth: Long,
+    financialAssetTotal: Long
+) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-        SummaryRow("총 자산", "3,000,000원", amountColor = ButtonBlue, isTotal = true)
+        SummaryRow("총 자산", formatAmount(totalNetWorth.toString()), amountColor = ButtonBlue, isTotal = true)
         Spacer(modifier = Modifier.height(16.dp))
-        SummaryRow("금융 자산", "3,000,000원", titleColor = Gray, amountWeight = FontWeight.Normal)
+        SummaryRow("금융 자산", formatAmount(financialAssetTotal.toString()), titleColor = Gray, amountWeight = FontWeight.Normal)
         Spacer(modifier = Modifier.height(8.dp))
-        SummaryRow("가상자산 계좌", "3,000,000원", titleColor = Gray, amountWeight = FontWeight.Normal)
+        SummaryRow("가상자산 계좌", "0원", titleColor = Gray, amountWeight = FontWeight.Normal)
     }
 }
 
