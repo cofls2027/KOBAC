@@ -35,6 +35,7 @@ import com.example.kobac_app.data.api.ApiService
 import com.example.kobac_app.data.model.LoginRequest
 import com.example.kobac_app.data.util.TokenManager
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -118,6 +119,15 @@ fun LoginScreen(navController: NavController) {
                             }
                         } else {
                             errorMessage = response.error?.message ?: "로그인에 실패했습니다"
+                        }
+                    } catch (e: HttpException) {
+                        when (e.code()) {
+                            503 -> errorMessage = "서버가 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해주세요."
+                            500 -> errorMessage = "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+                            404 -> errorMessage = "요청한 서비스를 찾을 수 없습니다."
+                            401 -> errorMessage = "아이디 또는 비밀번호가 올바르지 않습니다."
+                            403 -> errorMessage = "접근 권한이 없습니다."
+                            else -> errorMessage = "서버 오류가 발생했습니다. (HTTP ${e.code()})"
                         }
                     } catch (e: java.net.SocketTimeoutException) {
                         errorMessage = "서버 연결 시간이 초과되었습니다. 네트워크 연결을 확인하고 다시 시도해주세요."

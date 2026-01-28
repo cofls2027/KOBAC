@@ -45,7 +45,7 @@ fun ConnectionCompleteScreen(navController: NavController, isVirtualAsset: Boole
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "~~님,\n환영합니다!",
+            text = "홍길동님,\n환영합니다!",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = Black,

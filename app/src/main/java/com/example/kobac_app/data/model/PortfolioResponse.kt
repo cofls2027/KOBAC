@@ -113,6 +113,23 @@ data class Insu(
     val expDate: String?
 )
 
+data class CryptoAsset(
+    @SerializedName("symbol")
+    val symbol: String,
+    
+    @SerializedName("chain")
+    val chain: String,
+    
+    @SerializedName("balance")
+    val balance: String,
+    
+    @SerializedName("valueKrw")
+    val valueKrw: String,
+    
+    @SerializedName("valueUsd")
+    val valueUsd: String
+)
+
 data class PortfolioResponse(
     @SerializedName("bankList")
     val bankList: List<Bank>,
@@ -133,7 +150,7 @@ data class PortfolioResponse(
     val insuList: List<Insu>,
     
     @SerializedName("cryptoList")
-    val cryptoList: List<Any>,
+    val cryptoList: List<CryptoAsset>,
     
     @SerializedName("totalNetWorthKrw")
     val totalNetWorthKrw: Double,

@@ -91,9 +91,14 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
     }
 
     val virtualAssets = remember(portfolioData) {
-        portfolioData?.cryptoList?.mapNotNull { crypto ->
-            // cryptoList가 비어있으므로 빈 리스트 반환
-            null
+        portfolioData?.cryptoList?.map { crypto ->
+            val valueKrw = crypto.valueKrw.toDoubleOrNull() ?: 0.0
+            VirtualAsset(
+                address = "${crypto.symbol} (${crypto.chain.uppercase()})",
+                balanceKrw = formatAmount(valueKrw),
+                balanceAsset = "${crypto.balance} ${crypto.symbol}",
+                logo = getCryptoLogo(crypto.symbol, crypto.chain)
+            )
         } ?: emptyList()
     }
 
@@ -104,6 +109,7 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
         data.investList.sumOf { it.totalEvalAmt.toDoubleOrNull() ?: 0.0 } +
         data.investIrpList.sumOf { it.totalEvalAmt.toDoubleOrNull() ?: 0.0 }
     } ?: 0.0
+    val virtualAssetTotal = portfolioData?.cryptoList?.sumOf { it.valueKrw.toDoubleOrNull() ?: 0.0 } ?: 0.0
 
     if (isLoading) {
         Box(
@@ -136,7 +142,8 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
             item {
                 SummarySection(
                     totalNetWorth = totalNetWorth,
-                    financialAssetTotal = financialAssetTotal
+                    financialAssetTotal = financialAssetTotal,
+                    virtualAssetTotal = virtualAssetTotal
                 )
                 Spacer(modifier = Modifier.height(32.dp))
             }
@@ -175,6 +182,16 @@ fun formatAmount(amount: Double): String {
     return "${formatter.format(amount.toLong())}원"
 }
 
+fun getCryptoLogo(symbol: String, chain: String): Int {
+    return when {
+        symbol.equals("BTC", ignoreCase = true) || chain.equals("btc", ignoreCase = true) -> R.drawable.btc
+        symbol.equals("ETH", ignoreCase = true) || chain.equals("eth", ignoreCase = true) -> R.drawable.eth
+        symbol.equals("SOL", ignoreCase = true) || chain.equals("sol", ignoreCase = true) -> R.drawable.sol
+        symbol.equals("XRP", ignoreCase = true) || chain.equals("xrp", ignoreCase = true) -> R.drawable.xrp
+        else -> R.drawable.btc // 기본값
+    }
+}
+
 fun getBankLogo(bankName: String): Int {
     return when {
         bankName.contains("우리") -> R.drawable.wooribank
@@ -197,14 +214,15 @@ fun getInvestLogo(companyName: String): Int {
 @Composable
 fun SummarySection(
     totalNetWorth: Double,
-    financialAssetTotal: Double
+    financialAssetTotal: Double,
+    virtualAssetTotal: Double
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
         SummaryRow("총 자산", formatAmount(totalNetWorth), amountColor = ButtonBlue, isTotal = true)
         Spacer(modifier = Modifier.height(16.dp))
         SummaryRow("금융 자산", formatAmount(financialAssetTotal), titleColor = Gray, amountWeight = FontWeight.Normal)
         Spacer(modifier = Modifier.height(8.dp))
-        SummaryRow("가상자산 계좌", "0원", titleColor = Gray, amountWeight = FontWeight.Normal)
+        SummaryRow("가상자산 계좌", formatAmount(virtualAssetTotal), titleColor = Gray, amountWeight = FontWeight.Normal)
     }
 }
 

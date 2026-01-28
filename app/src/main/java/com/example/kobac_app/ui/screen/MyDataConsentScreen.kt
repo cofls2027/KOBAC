@@ -47,9 +47,8 @@ fun MyDataConsentScreen(navController: NavController) {
 
         Column(modifier = Modifier.height(180.dp)) {
             val annotatedTitle = buildAnnotatedString {
-                append("자산을 연결하려면\n")
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("~~님의 동의가 필요해요")
+                    append("자산을 연결하려면\n홍길동님의 동의가 필요해요")
                 }
             }
 
@@ -64,7 +63,7 @@ fun MyDataConsentScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "자산을 연결하기 전 신중하게 고민하여 필요한 서비스만 연결해주세요.\n사용하지 않는 서비스는 언제든지 삭제할 수 있습니다.",
+                text = "자산을 연결하기 전 신중하게 고민하여 필요한 서비스만\n연결해주세요.\n사용하지 않는 서비스는 언제든지 삭제할 수 있습니다.",
                 color = Gray,
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),
