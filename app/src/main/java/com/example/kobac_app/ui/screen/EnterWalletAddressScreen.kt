@@ -2,7 +2,6 @@ package com.example.kobac_app.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,8 +35,7 @@ data class WalletAddress(val address: String, val logo: Int, val assetType: Stri
 @Composable
 fun EnterWalletAddressScreen(navController: NavController) {
     var addressInput by remember { mutableStateOf("") }
-    var selectedAssetType by remember { mutableStateOf("btc") }
-    var walletAddresses by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var walletAddresses by remember { mutableStateOf<List<String>>(emptyList()) }
     val focusManager = LocalFocusManager.current
 
     val assetTypes = listOf(
@@ -65,35 +63,6 @@ fun EnterWalletAddressScreen(navController: NavController) {
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 자산 타입 선택
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                assetTypes.forEach { (type, logo) ->
-                    Surface(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { selectedAssetType = type },
-                        shape = RoundedCornerShape(8.dp),
-                        color = if (selectedAssetType == type) ButtonBlue else LightGray
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Image(
-                                painter = painterResource(id = logo),
-                                contentDescription = type,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             TextField(
                 value = addressInput,
                 onValueChange = { addressInput = it },
@@ -107,8 +76,8 @@ fun EnterWalletAddressScreen(navController: NavController) {
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = {
-                    if (addressInput.isNotBlank()) {
-                        walletAddresses = walletAddresses + (selectedAssetType to addressInput)
+                    if (addressInput.isNotBlank() && walletAddresses.size < assetTypes.size) {
+                        walletAddresses = walletAddresses + addressInput
                         addressInput = ""
                     }
                     focusManager.clearFocus()
@@ -123,8 +92,8 @@ fun EnterWalletAddressScreen(navController: NavController) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 80.dp) // Padding for the button
             ) {
-                items(walletAddresses.toList()) { (type, address) ->
-                    val logo = assetTypes.find { it.first == type }?.second ?: R.drawable.btc
+                items(walletAddresses.withIndex().toList()) { (index, address) ->
+                    val (type, logo) = assetTypes[index]
                     WalletAddressListItem(WalletAddress(address, logo, type))
                 }
             }
@@ -134,7 +103,11 @@ fun EnterWalletAddressScreen(navController: NavController) {
             Button(
                 onClick = {
                     // 주소 데이터를 TokenManager에 저장
-                    TokenManager.saveCryptoAddresses(walletAddresses)
+                    val addressesToSave = assetTypes
+                        .map { it.first }
+                        .zip(walletAddresses)
+                        .toMap()
+                    TokenManager.saveCryptoAddresses(addressesToSave)
                     navController.navigate(AppRoutes.CONNECTING_VIRTUAL_ASSET)
                 },
                 modifier = Modifier

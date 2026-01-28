@@ -20,10 +20,6 @@ import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.Black
 import com.example.kobac_app.ui.theme.KOBAC_appTheme
-import com.example.kobac_app.data.api.RetrofitClient
-import com.example.kobac_app.data.api.ApiService
-import com.example.kobac_app.data.model.ConnectRequest
-import com.example.kobac_app.data.util.TokenManager
 import kotlinx.coroutines.delay
 
 @Composable
@@ -37,49 +33,11 @@ fun ConnectingVirtualAssetScreen(navController: NavController) {
         )
     }
     var currentImageIndex by remember { mutableStateOf(0) }
-    val apiService = remember { RetrofitClient.createService<ApiService>() }
 
     LaunchedEffect(Unit) {
-        try {
-            // user_search_id 가져오기
-            val userSearchId = TokenManager.getUserId() ?: return@LaunchedEffect
-            
-            // EnterWalletAddressScreen에서 입력한 가상자산 주소 가져오기
-            val cryptoAddresses = TokenManager.getCryptoAddresses()
-            
-            // 주소가 없으면 기본값 사용 (테스트용)
-            val finalCryptoAddresses = if (cryptoAddresses.isEmpty()) {
-                mapOf(
-                    "btc" to "tb1pqwfn9jsucugtwu3zk00dw46xrwfshdx3qlrvrd8ha94gxcdt0fgq9uunz2",
-                    "eth" to "0x13CB6AE34A13a0977F4d7101eBc24B87Bb23F0d5",
-                    "sol" to "6ZRCB7AAqGre6pxnPxzS6CqS77GZ6T1jU8GBA811xKkH",
-                    "xrp" to "rKpT1UbrVJjEmmR11e3WCaQkC7jdgBD8qv"
-                )
-            } else {
-                cryptoAddresses
-            }
-            
-            // API 호출
-            val request = ConnectRequest(
-                mockToken = "test-token-123",
-                userSearchId = userSearchId,
-                cryptoAddresses = finalCryptoAddresses
-            )
-            
-            val response = apiService.connectMyData(request)
-            
-            if (response.success) {
-                // 성공 시 완료 화면으로 이동
-                navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = true))
-            } else {
-                // 실패 시 에러 처리 (필요시 에러 화면으로 이동)
-                navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = true))
-            }
-        } catch (e: Exception) {
-            // 네트워크 오류 등 예외 처리
-            // 일단 완료 화면으로 이동하되, 필요하면 에러 처리 추가 가능
-            navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = true))
-        }
+        // 백엔드 연결 제거 - 하드코딩으로 처리
+        delay(2000) // 2초 애니메이션 후 완료 화면으로 이동
+        navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = true))
     }
 
     LaunchedEffect(Unit) {
