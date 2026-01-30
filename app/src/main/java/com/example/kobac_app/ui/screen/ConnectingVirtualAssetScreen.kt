@@ -20,6 +20,10 @@ import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.Black
 import com.example.kobac_app.ui.theme.KOBAC_appTheme
+import com.example.kobac_app.data.api.RetrofitClient
+import com.example.kobac_app.data.api.ApiService
+import com.example.kobac_app.data.model.ConnectRequest
+import com.example.kobac_app.data.util.TokenManager
 import kotlinx.coroutines.delay
 
 @Composable
@@ -33,11 +37,25 @@ fun ConnectingVirtualAssetScreen(navController: NavController) {
         )
     }
     var currentImageIndex by remember { mutableStateOf(0) }
+    val apiService = remember { RetrofitClient.createService<ApiService>() }
 
     LaunchedEffect(Unit) {
-        // 백엔드 연결 제거 - 하드코딩으로 처리
-        delay(2000) // 2초 애니메이션 후 완료 화면으로 이동
-        navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = true))
+        try {
+            val cryptoAddresses = TokenManager.getCryptoAddresses()
+            val request = ConnectRequest(
+                mockToken = "test-token-123",
+                userSearchId = "user_ci_12345_xyz", // 고정값
+                cryptoAddresses = cryptoAddresses
+            )
+            apiService.connectMyData(request)
+
+            // 성공 시 (2xx 응답)
+            navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = true))
+        } catch (e: Exception) {
+            // 실패 시 (네트워크 오류 또는 2xx 이외 응답)
+            // 필요 시 에러 처리 로직 추가
+            navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = true))
+        }
     }
 
     LaunchedEffect(Unit) {

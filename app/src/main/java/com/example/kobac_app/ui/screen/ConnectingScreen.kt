@@ -43,29 +43,18 @@ fun ConnectingScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         try {
-            // user_search_id 가져오기 (로그인 시 저장한 userId 사용)
-            val userSearchId = TokenManager.getUserId() ?: return@LaunchedEffect
-            
-            // API 호출
             val request = ConnectRequest(
                 mockToken = "test-token-123",
-                userSearchId = userSearchId,
-                cryptoAddresses = emptyMap() // 빈 객체로 전송하여 가상자산 연동 스킵
+                userSearchId = "user_ci_12345_xyz", // 고정값
+                cryptoAddresses = emptyMap()
             )
-            
-            val response = apiService.connectMyData(request)
-            
-            if (response.success) {
-                // 성공 시 완료 화면으로 이동
-                navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = false))
-            } else {
-                // 실패 시 에러 처리 (필요시 에러 화면으로 이동)
-                // 일단 완료 화면으로 이동하되, 필요하면 에러 처리 추가 가능
-                navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = false))
-            }
+            apiService.connectMyData(request)
+
+            // 성공 시 (2xx 응답)
+            navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = false))
         } catch (e: Exception) {
-            // 네트워크 오류 등 예외 처리
-            // 일단 완료 화면으로 이동하되, 필요하면 에러 처리 추가 가능
+            // 실패 시 (네트워크 오류 또는 2xx 이외 응답)
+            // 필요 시 에러 처리 로직 추가
             navController.navigate(AppRoutes.connectionCompleteRoute(isVirtualAsset = false))
         }
     }

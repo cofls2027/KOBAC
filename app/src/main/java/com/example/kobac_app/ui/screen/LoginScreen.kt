@@ -104,21 +104,16 @@ fun LoginScreen(navController: NavController) {
                     try {
                         val response = apiService.login(LoginRequest(id, password))
                         
-                        if (response.success && response.data != null) {
-                            val loginResponse = response.data
-                            TokenManager.saveToken(loginResponse.accessToken, loginResponse.expiresInSec)
-                            TokenManager.saveUser(
-                                loginResponse.user.userId,
-                                loginResponse.user.email,
-                                loginResponse.user.name
-                            )
-                            
-                            // 로그인 성공 시 홈 화면으로 이동
-                            navController.navigate(AppRoutes.HOME) {
-                                popUpTo(AppRoutes.LOGIN) { inclusive = true }
-                            }
-                        } else {
-                            errorMessage = response.error?.message ?: "로그인에 실패했습니다"
+                        // 성공 (2xx 응답)
+                        TokenManager.saveToken(response.accessToken, response.expiresInSec)
+                        TokenManager.saveUser(
+                            response.user.userId,
+                            response.user.email,
+                            response.user.name
+                        )
+                        
+                        navController.navigate(AppRoutes.HOME) {
+                            popUpTo(AppRoutes.LOGIN) { inclusive = true }
                         }
                     } catch (e: HttpException) {
                         when (e.code()) {
@@ -158,11 +153,10 @@ fun LoginScreen(navController: NavController) {
             }
         }
         
-        // 에러 메시지 표시
-        errorMessage?.let { error ->
+        errorMessage?.let {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = error,
+                text = it,
                 color = Color.Red,
                 fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(),

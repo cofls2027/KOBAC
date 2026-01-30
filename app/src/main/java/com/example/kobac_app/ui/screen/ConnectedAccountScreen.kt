@@ -23,7 +23,6 @@ import com.example.kobac_app.ui.theme.*
 import com.example.kobac_app.data.api.RetrofitClient
 import com.example.kobac_app.data.api.ApiService
 import com.example.kobac_app.data.model.PortfolioResponse
-import com.example.kobac_app.data.model.CryptoAsset
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
@@ -33,7 +32,7 @@ data class FinancialAsset(val name: String, val balance: String, val logo: Int)
 data class VirtualAsset(val address: String, val balanceKrw: String, val balanceAsset: String, val logo: Int)
 
 @Composable
-fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Boolean) {
+fun ConnectedAccountScreen(navController: NavController) {
     var portfolioData by remember { mutableStateOf<PortfolioResponse?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -91,50 +90,16 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
         } ?: emptyList()
     }
 
-    // 하드코딩된 가상자산 데이터 (백엔드 연결 제거)
-    val hardcodedCryptoAssets = remember {
-        listOf(
-            CryptoAsset(
-                symbol = "BTC",
-                chain = "btc",
-                balance = "0.7730799200",
-                valueKrw = "100304800.38",
-                valueUsd = "77157.54"
-            ),
-            CryptoAsset(
-                symbol = "ETH",
-                chain = "eth",
-                balance = "945.7081664328",
-                valueKrw = "4145038893.48",
-                valueUsd = "3188491.46"
+    val virtualAssets = remember(portfolioData) {
+        portfolioData?.cryptoList?.map { crypto ->
+            val valueKrw = crypto.valueKrw.toDoubleOrNull() ?: 0.0
+            VirtualAsset(
+                address = "${crypto.symbol} (${crypto.chain.uppercase()})",
+                balanceKrw = formatAmount(valueKrw),
+                balanceAsset = "${crypto.balance} ${crypto.symbol}",
+                logo = getCryptoLogo(crypto.symbol, crypto.chain)
             )
-        )
-    }
-
-    val virtualAssets = remember(portfolioData, showVirtualAssets) {
-        if (showVirtualAssets) {
-            // 가상자산 연결 완료 시 하드코딩된 데이터 사용
-            hardcodedCryptoAssets.map { crypto ->
-                val valueKrw = crypto.valueKrw.toDoubleOrNull() ?: 0.0
-                VirtualAsset(
-                    address = "${crypto.symbol} (${crypto.chain.uppercase()})",
-                    balanceKrw = formatAmount(valueKrw),
-                    balanceAsset = "${crypto.balance} ${crypto.symbol}",
-                    logo = getCryptoLogo(crypto.symbol, crypto.chain)
-                )
-            }
-        } else {
-            // 가상자산 연결 전에는 서버 데이터 사용 (없으면 빈 리스트)
-            portfolioData?.cryptoList?.map { crypto ->
-                val valueKrw = crypto.valueKrw.toDoubleOrNull() ?: 0.0
-                VirtualAsset(
-                    address = "${crypto.symbol} (${crypto.chain.uppercase()})",
-                    balanceKrw = formatAmount(valueKrw),
-                    balanceAsset = "${crypto.balance} ${crypto.symbol}",
-                    logo = getCryptoLogo(crypto.symbol, crypto.chain)
-                )
-            } ?: emptyList()
-        }
+        } ?: emptyList()
     }
 
     val financialAssetTotal = portfolioData?.let { data ->
@@ -143,15 +108,11 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
         data.investList.sumOf { it.totalEvalAmt.toDoubleOrNull() ?: 0.0 } +
         data.investIrpList.sumOf { it.totalEvalAmt.toDoubleOrNull() ?: 0.0 }
     } ?: 0.0
-    val virtualAssetTotal = remember(portfolioData, showVirtualAssets) {
-        if (showVirtualAssets) {
-            // 가상자산 연결 완료 시 하드코딩된 데이터의 총합 사용
-            hardcodedCryptoAssets.sumOf { it.valueKrw.toDoubleOrNull() ?: 0.0 }
-        } else {
-            // 가상자산 연결 전에는 서버 데이터 사용
-            portfolioData?.cryptoList?.sumOf { it.valueKrw.toDoubleOrNull() ?: 0.0 } ?: 0.0
-        }
+
+    val virtualAssetTotal = remember(portfolioData) {
+        portfolioData?.cryptoList?.sumOf { it.valueKrw.toDoubleOrNull() ?: 0.0 } ?: 0.0
     }
+    
     val totalNetWorth = financialAssetTotal + virtualAssetTotal
 
     if (isLoading) {
@@ -203,7 +164,7 @@ fun ConnectedAccountScreen(navController: NavController, showVirtualAssets: Bool
             item {
                 Text("가상 자산 계좌", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Black)
                 Spacer(modifier = Modifier.height(8.dp))
-                if (showVirtualAssets && virtualAssets.isNotEmpty()) {
+                if (virtualAssets.isNotEmpty()) {
                     VirtualAssetList(virtualAssets)
                 } else {
                     VirtualAssetEmptyCard(navController)
@@ -384,6 +345,6 @@ fun VirtualAssetEmptyCard(navController: NavController) {
 @Composable
 fun ConnectedAccountScreenPreview() {
     KOBAC_appTheme {
-        ConnectedAccountScreen(navController = rememberNavController(), showVirtualAssets = true)
+        ConnectedAccountScreen(navController = rememberNavController())
     }
 }

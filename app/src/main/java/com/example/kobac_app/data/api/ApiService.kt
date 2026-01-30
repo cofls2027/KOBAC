@@ -1,23 +1,24 @@
 package com.example.kobac_app.data.api
 
-import com.example.kobac_app.data.model.ApiResponse
-import com.example.kobac_app.data.model.ConnectRequest
-import com.example.kobac_app.data.model.ConnectResponse
-import com.example.kobac_app.data.model.LoginRequest
-import com.example.kobac_app.data.model.LoginResponse
-import com.example.kobac_app.data.model.PortfolioResponse
+import com.example.kobac_app.data.model.*
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Body
-import retrofit2.http.Query
+import retrofit2.http.Header
 
 interface ApiService {
-    @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): ApiResponse<LoginResponse>
-    
+    @POST("users/login/v2")
+    suspend fun login(@Body loginRequest: LoginRequest): LoginResponse
+
     @POST("mydata/connect")
-    suspend fun connectMyData(@Body request: ConnectRequest): ApiResponse<ConnectResponse>
-    
-    @GET("mydata/portfolio")
+    suspend fun connectMyData(@Body connectRequest: ConnectRequest): ConnectResponse
+
+    @GET("portfolio")
     suspend fun getPortfolio(): PortfolioResponse
+
+    @POST("mydata/job/refresh")
+    suspend fun refreshJob(@Header("Authorization") token: String): RefreshJobResponse
+    
+    @POST("blockchain/scan")
+    suspend fun blockchainScan(@Body blockchainScanRequest: BlockchainScanRequest): BlockchainScanResponse
 }

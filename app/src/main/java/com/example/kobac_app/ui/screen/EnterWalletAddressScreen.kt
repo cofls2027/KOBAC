@@ -28,22 +28,23 @@ import androidx.navigation.compose.rememberNavController
 import com.example.kobac_app.R
 import com.example.kobac_app.ui.AppRoutes
 import com.example.kobac_app.ui.theme.*
+import com.example.kobac_app.data.api.RetrofitClient
+import com.example.kobac_app.data.api.ApiService
+import com.example.kobac_app.data.model.BlockchainScanRequest
+import com.example.kobac_app.data.model.ScannedAsset
 import com.example.kobac_app.data.util.TokenManager
-
-data class WalletAddress(val address: String, val logo: Int, val assetType: String)
+import kotlinx.coroutines.launch
 
 @Composable
 fun EnterWalletAddressScreen(navController: NavController) {
     var addressInput by remember { mutableStateOf("") }
-    var walletAddresses by remember { mutableStateOf<List<String>>(emptyList()) }
+    var scannedAssets by remember { mutableStateOf<List<ScannedAsset>>(emptyList()) }
+    var assetCount by remember { mutableStateOf(0) }
+    var scannedAddress by remember { mutableStateOf("") }
+    var scannedChains by remember { mutableStateOf<List<String>>(emptyList()) }
     val focusManager = LocalFocusManager.current
-
-    val assetTypes = listOf(
-        "btc" to R.drawable.btc,
-        "eth" to R.drawable.eth,
-        "sol" to R.drawable.sol,
-        "xrp" to R.drawable.xrp
-    )
+    val scope = rememberCoroutineScope()
+    val apiService = remember { RetrofitClient.createService<ApiService>() }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
         Column(
@@ -76,9 +77,19 @@ fun EnterWalletAddressScreen(navController: NavController) {
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = {
-                    if (addressInput.isNotBlank() && walletAddresses.size < assetTypes.size) {
-                        walletAddresses = walletAddresses + addressInput
-                        addressInput = ""
+                    if (addressInput.isNotBlank()) {
+                        scannedAddress = addressInput
+                        scope.launch {
+                            try {
+                                val request = BlockchainScanRequest(address = addressInput)
+                                val response = apiService.blockchainScan(request)
+                                scannedAssets = response.assets
+                                assetCount = response.assetCount
+                                scannedChains = response.chains
+                            } catch (e: Exception) {
+                                // Handle error
+                            }
+                        }
                     }
                     focusManager.clearFocus()
                 })
@@ -90,23 +101,19 @@ fun EnterWalletAddressScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             LazyColumn(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 80.dp) // Padding for the button
+                modifier = Modifier.fillMaxWidth().padding(bottom = 80.dp)
             ) {
-                items(walletAddresses.withIndex().toList()) { (index, address) ->
-                    val (type, logo) = assetTypes[index]
-                    WalletAddressListItem(WalletAddress(address, logo, type))
+                items(scannedAssets) { asset ->
+                    WalletAddressListItem(asset)
                 }
             }
         }
 
-        if (walletAddresses.isNotEmpty()) {
+        if (scannedAssets.isNotEmpty()) {
             Button(
                 onClick = {
-                    // 주소 데이터를 TokenManager에 저장
-                    val addressesToSave = assetTypes
-                        .map { it.first }
-                        .zip(walletAddresses)
-                        .toMap()
+                    val addressesToSave = scannedChains.associateWith { scannedAddress }.toMutableMap()
+                    addressesToSave["auto"] = scannedAddress
                     TokenManager.saveCryptoAddresses(addressesToSave)
                     navController.navigate(AppRoutes.CONNECTING_VIRTUAL_ASSET)
                 },
@@ -118,25 +125,30 @@ fun EnterWalletAddressScreen(navController: NavController) {
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ButtonBlue)
             ) {
-                Text("${walletAddresses.size}개 연결하기", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text("${assetCount}개 연결하기", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
 }
 
 @Composable
-fun WalletAddressListItem(wallet: WalletAddress) {
+fun WalletAddressListItem(asset: ScannedAsset) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(painter = painterResource(id = wallet.logo), contentDescription = "Asset Logo", modifier = Modifier.size(36.dp))
+        Image(painter = painterResource(id = getCryptoLogo(asset.symbol, asset.chain)), contentDescription = "Asset Logo", modifier = Modifier.size(36.dp))
         Spacer(modifier = Modifier.width(16.dp))
-        Text(wallet.address, fontSize = 16.sp, color = Black, modifier = Modifier.weight(1f))
+        Text(asset.symbol, fontSize = 16.sp, color = Black, modifier = Modifier.weight(1f))
+        Column(horizontalAlignment = Alignment.End) {
+            Text("${asset.valueKrw}원", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Black)
+            Text("${asset.balance} ${asset.symbol}", fontSize = 12.sp, color = Gray)
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

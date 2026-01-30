@@ -11,7 +11,7 @@ class AuthInterceptor : Interceptor {
         val requestBuilder = request.newBuilder()
         
         // 로그인 API는 토큰이 필요 없으므로 제외
-        if (!request.url.encodedPath.contains("/auth/login")) {
+        if (!request.url.encodedPath.contains("/users/login/v2")) {
             // 저장된 토큰을 헤더에 추가
             val token = TokenManager.getToken()
             if (token != null && TokenManager.isTokenValid()) {
