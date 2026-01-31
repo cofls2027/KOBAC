@@ -7,26 +7,26 @@ import java.util.UUID
 
 class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        val requestBuilder = request.newBuilder()
-        
-        // 로그인 API는 토큰이 필요 없으므로 제외
-        if (!request.url.encodedPath.contains("/users/login/v2")) {
-            // 저장된 토큰을 헤더에 추가
+        val originalRequest = chain.request()
+        val requestBuilder = originalRequest.newBuilder()
+
+        // 1. Content-Type 헤더는 본문(body)이 있는 모든 요청에 필요할 수 있으므로 먼저 처리
+        if (originalRequest.body != null && originalRequest.header("Content-Type") == null) {
+            requestBuilder.addHeader("Content-Type", "application/json; charset=UTF-8")
+        }
+
+        // 2. 로그인 API가 아닌 경우에만 인증 및 트랜잭션 헤더 추가
+        if (!originalRequest.url.encodedPath.contains("/auth/login")) {
+            // 트랜잭션 ID 헤더 추가
+            requestBuilder.addHeader("x-api-tran-id", UUID.randomUUID().toString().replace("-", "").uppercase())
+
+            // 유효한 토큰이 있을 경우, 인증 헤더 추가
             val token = TokenManager.getToken()
             if (token != null && TokenManager.isTokenValid()) {
                 requestBuilder.addHeader("Authorization", "Bearer $token")
             }
         }
-        
-        // x-api-tran-id 헤더 추가 (필수)
-        requestBuilder.addHeader("x-api-tran-id", UUID.randomUUID().toString().replace("-", "").uppercase())
-        
-        // Content-Type 헤더 추가 (POST 요청인 경우)
-        if (request.body != null && request.header("Content-Type") == null) {
-            requestBuilder.addHeader("Content-Type", "application/json; charset=UTF-8")
-        }
-        
+
         return chain.proceed(requestBuilder.build())
     }
 }

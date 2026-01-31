@@ -103,13 +103,14 @@ fun LoginScreen(navController: NavController) {
                 scope.launch {
                     try {
                         val response = apiService.login(LoginRequest(id, password))
+                        val data = response.data
                         
                         // 성공 (2xx 응답)
-                        TokenManager.saveToken(response.accessToken, response.expiresInSec)
+                        TokenManager.saveToken(data.accessToken, data.expiresInSec)
                         TokenManager.saveUser(
-                            response.user.userId,
-                            response.user.email,
-                            response.user.name
+                            data.user.userId,
+                            data.user.email,
+                            data.user.name
                         )
                         
                         navController.navigate(AppRoutes.HOME) {

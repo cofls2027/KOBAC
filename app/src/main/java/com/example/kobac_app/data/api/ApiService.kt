@@ -7,8 +7,8 @@ import retrofit2.http.POST
 import retrofit2.http.Header
 
 interface ApiService {
-    @POST("users/login/v2")
-    suspend fun login(@Body loginRequest: LoginRequest): LoginResponse
+    @POST("auth/login")
+    suspend fun login(@Body loginRequest: LoginRequest): LoginApiResponse
 
     @POST("mydata/connect")
     suspend fun connectMyData(@Body connectRequest: ConnectRequest): ConnectResponse
